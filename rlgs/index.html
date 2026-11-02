@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="RLGS: Reinforcement Learning-Based Adaptive Hyperparameter Tuning for Gaussian Splatting" />
+    <meta name="keywords" content="3D Gaussian Splatting, reinforcement learning, hyperparameter tuning, novel view synthesis" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <title>RLGS: Reinforcement Learning-Based Adaptive Hyperparameter Tuning for Gaussian Splatting</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <nav class="navbar" aria-label="Main navigation">
+      <div class="container navbar-inner">
+        <a class="navbar-item" href="#top" aria-label="Home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3z" /></svg>
+        </a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="container is-max-desktop has-text-centered">
+          <h1 class="publication-title">RLGS: Reinforcement Learning-Based Adaptive<br class="title-break" /> Hyperparameter Tuning for Gaussian Splatting</h1>
+          <h2 class="publication-venue">
+            <a href="https://wacv.thecvf.com/">WACV 2027</a>
+          </h2>
+
+          <div class="publication-authors">
+            <span class="author-block"><a href="https://lizhan17.github.io/web/">Zhan Li</a></span>
+            <span class="author-block"><a href="https://huangying-zhan.github.io/">Huangying Zhan</a></span>
+            <span class="author-block"><a href="https://changyangli.github.io/">Changyang Li</a></span>
+            <span class="author-block"><a href="https://yanqingan.github.io/">Qingan Yan</a></span>
+            <span class="author-block"><a href="https://www.linkedin.com/in/yi-xu-42654823">Yi Xu</a></span>
+          </div>
+
+          <div class="publication-affiliation">
+            <a class="institution-name" href="http://www.goertek.com/" target="_blank" rel="noopener noreferrer">Goertek Alpha Labs</a>
+          </div>
+
+          <div class="publication-links" aria-label="Project links">
+            <a class="button is-dark is-rounded" href="https://arxiv.org/abs/2508.04078" target="_blank" rel="noopener noreferrer" aria-label="View paper on arXiv">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7M10 14 21 3M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6" /></svg>
+              <span>arXiv</span>
+            </a>
+            <span class="button is-dark is-rounded is-disabled" aria-label="Code coming soon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 6l-4 12" /></svg>
+              <span>Code</span>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero is-light teaser">
+        <div class="container is-max-desktop">
+          <figure>
+            <img
+              src="assets/teaser.png"
+              alt="Visual comparison on the Train scene and a plot showing RLGS continuing to improve as the Gaussian count grows"
+              width="2250"
+              height="639"
+            />
+            <figcaption>
+              Our reinforcement learning-based hyperparameter tuning consistently improves Taming-3DGS <a class="citation" href="#ref-1">[1]</a> across different Gaussian budgets. When the baseline saturates, RLGS continues to improve reconstruction quality.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="abstract">
+        <div class="container is-max-desktop">
+          <div class="content-block">
+            <h2 class="section-title">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Hyperparameter tuning in 3D Gaussian Splatting (3DGS) <a class="citation" href="#ref-2">[2]</a> is a labor-intensive and expert-driven process, often resulting in inconsistent reconstructions and suboptimal results. We propose RLGS, a plug-and-play reinforcement learning framework for adaptive hyperparameter tuning in 3DGS through lightweight policy modules. RLGS dynamically adjusts critical hyperparameters such as learning rates and densification thresholds.
+              </p>
+              <p>
+                The framework is model-agnostic and integrates into existing 3DGS pipelines without architectural modifications. We demonstrate its generalization across multiple 3DGS variants, including Taming-3DGS <a class="citation" href="#ref-1">[1]</a> and 3DGS-MCMC <a class="citation" href="#ref-3">[3]</a>, and validate its robustness across diverse datasets. RLGS improves Taming-3DGS by <strong>0.7 dB PSNR</strong> on Tanks and Temples <a class="citation" href="#ref-4">[4]</a> under a fixed Gaussian budget, and continues to yield gains even when baseline performance saturates.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="method">
+        <div class="container is-max-desktop">
+          <div class="content-block">
+            <h2 class="section-title">Method</h2>
+
+            <figure class="main-figure">
+              <img
+                src="assets/method.png"
+                alt="RLGS framework with separate reinforcement learning loops for learning-rate and densification policies"
+                width="1689"
+                height="594"
+              />
+            </figure>
+            <div class="content has-text-justified">
+              <p>
+                RLGS treats hyperparameter tuning as an online reinforcement learning problem. It divides 3DGS optimization into short policy phases and uses two lightweight modules: <strong>RLLR</strong> adaptively scales learning rates, while <strong>RLDS</strong> adjusts densification hyperparameters.
+              </p>
+              <p>
+                At each phase, the policy observes the previous reconstruction loss and current training progress. It samples candidate actions, evaluates them through short simulated training runs from the same snapshot, and receives a reward based on PSNR improvement over the default action. The best-performing configuration is then applied to the actual training state.
+              </p>
+            </div>
+          </div>
+
+          <div class="content-block subsection">
+            <h3 class="subsection-title">Reward View Sampling</h3>
+            <figure class="medium-figure">
+              <img
+                src="assets/reward-sampling.png"
+                alt="Reward-view sampling procedure that periodically reshuffles training and reward views"
+                width="1047"
+                height="487"
+              />
+            </figure>
+            <div class="content has-text-justified">
+              <p>
+                RLGS withholds a small set of reward views to measure multi-view improvement without biasing the policy toward the current training views. The split is periodically reshuffled so that every image contributes to training over time while the reward remains stable within each short interval.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="results">
+        <div class="container is-max-desktop">
+          <div class="content-block">
+            <h2 class="section-title">Results</h2>
+            <p class="section-intro has-text-centered">
+              RLGS improves strong 3DGS backbones across public benchmarks and avoids the dozens of full runs required by conventional hyperparameter search.
+            </p>
+
+            <h3 class="subsection-title">Comparison with Hyperparameter Tuning Methods</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr><th>Method</th><th>Trials</th><th>Average PSNR ↑</th><th>Average SSIM ↑</th><th>Average LPIPS ↓</th><th>Wall Time ↓</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>TMGS <a class="citation" href="#ref-1">[1]</a></td><td>1</td><td>27.09</td><td>0.879</td><td>0.203</td><td>1×</td></tr>
+                  <tr><td>TMGS + Random Search <a class="citation" href="#ref-5">[5]</a></td><td>64</td><td>26.79</td><td>0.883</td><td>0.203</td><td>64×</td></tr>
+                  <tr><td>TMGS + Bayesian Optimization <a class="citation" href="#ref-6">[6]</a></td><td>64</td><td>27.04</td><td>0.884</td><td>0.202</td><td>64×</td></tr>
+                  <tr><td>TMGS + ASHA <a class="citation" href="#ref-7">[7]</a></td><td>64</td><td>27.21</td><td>0.887</td><td>0.198</td><td>24×</td></tr>
+                  <tr class="ours"><td>TMGS + RLGS</td><td>1</td><td><strong>27.50</strong></td><td><strong>0.889</strong></td><td><strong>0.195</strong></td><td>3×</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figure class="main-figure">
+              <img src="assets/tnt-deepblending.jpg" alt="Qualitative comparisons on TNT and Deep Blending across search methods and RLGS" width="2084" height="838" />
+              <figcaption>Qualitative comparisons on the Tanks and Temples <a class="citation" href="#ref-4">[4]</a> and Deep Blending <a class="citation" href="#ref-8">[8]</a> datasets.</figcaption>
+            </figure>
+          </div>
+
+          <div class="content-block subsection">
+            <h3 class="subsection-title">Generalization to DL3DV-140</h3>
+            <figure class="main-figure">
+              <img src="assets/dl3dv.jpg" alt="Qualitative results on five DL3DV scenes comparing ground truth, TMGS, and RLGS" width="1002" height="987" />
+            </figure>
+            <div class="content has-text-justified">
+              <p>
+                On DL3DV-140 <a class="citation" href="#ref-9">[9]</a>, RLGS improves TMGS from 29.75 to <strong>29.96 dB PSNR</strong>, raises SSIM from 0.909 to <strong>0.912</strong>, and reduces LPIPS from 0.131 to <strong>0.125</strong> across all 140 scenes. Qualitatively, it better preserves thin structures and fine textures.
+              </p>
+            </div>
+          </div>
+
+          <div class="content-block subsection">
+            <h3 class="subsection-title">Adaptation to 3DGS-MCMC</h3>
+            <figure class="main-figure">
+              <img src="assets/mcmc.jpg" alt="Qualitative Mip-NeRF 360 results comparing ground truth, 3DGS-MCMC, and RLGS" width="964" height="675" />
+            </figure>
+            <div class="content has-text-justified">
+              <p>
+                On Mip-NeRF 360 <a class="citation" href="#ref-10">[10]</a>, RLGS adapts to 3DGS-MCMC <a class="citation" href="#ref-3">[3]</a>, improving PSNR from 29.89 to <strong>30.12 dB</strong> and reducing LPIPS from 0.190 to <strong>0.144</strong> (24%), while SSIM changes from 0.900 to 0.897. This demonstrates that the controller is not tied to a single 3DGS pipeline.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section is-light" id="bibtex">
+        <div class="container is-max-desktop">
+          <div class="content-block">
+            <h2 class="section-title">BibTeX</h2>
+            <div class="bibtex-wrap">
+              <button class="copy-button" type="button" data-copy>Copy</button>
+              <pre><code id="bibtex-code">@misc{li2025rlgs,
+  title         = {RLGS: Reinforcement Learning-Based Adaptive Hyperparameter Tuning for Gaussian Splatting},
+  author        = {Zhan Li and Huangying Zhan and Changyang Li and Qingan Yan and Yi Xu},
+  year          = {2025},
+  eprint        = {2508.04078},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.GR},
+  url           = {https://arxiv.org/abs/2508.04078}
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="references">
+        <div class="container is-max-desktop">
+          <div class="content-block">
+            <h2 class="section-title">References</h2>
+            <ol class="reference-list has-text-justified">
+              <li id="ref-1">Saswat Subhajyoti Mallick, Rahul Goel, Bernhard Kerbl, Markus Steinberger, Francisco Vicente Carrasco, and Fernando De La Torre. <em>Taming 3DGS: High-Quality Radiance Fields with Limited Resources</em>. In SIGGRAPH Asia 2024 Conference Papers, pages 1-11, 2024.</li>
+              <li id="ref-2">Bernhard Kerbl, Georgios Kopanas, Thomas Leimkühler, and George Drettakis. <em>3D Gaussian Splatting for Real-Time Radiance Field Rendering</em>. ACM Transactions on Graphics, 42(4), 2023.</li>
+              <li id="ref-3">Shakiba Kheradmand, Daniel Rebain, Gopal Sharma, Weiwei Sun, Yang-Che Tseng, Hossam Isack, Abhishek Kar, Andrea Tagliasacchi, and Kwang Moo Yi. <em>3D Gaussian Splatting as Markov Chain Monte Carlo</em>. Advances in Neural Information Processing Systems, 37:80965-80986, 2024.</li>
+              <li id="ref-4">Arno Knapitsch, Jaesik Park, Qian-Yi Zhou, and Vladlen Koltun. <em>Tanks and Temples: Benchmarking Large-Scale Scene Reconstruction</em>. ACM Transactions on Graphics, 36(4):1-13, 2017.</li>
+              <li id="ref-5">James Bergstra and Yoshua Bengio. <em>Random Search for Hyper-Parameter Optimization</em>. Journal of Machine Learning Research, 13(1):281-305, 2012.</li>
+              <li id="ref-6">Jasper Snoek, Hugo Larochelle, and Ryan P. Adams. <em>Practical Bayesian Optimization of Machine Learning Algorithms</em>. Advances in Neural Information Processing Systems, 25, 2012.</li>
+              <li id="ref-7">Liam Li, Kevin Jamieson, Afshin Rostamizadeh, Ekaterina Gonina, Jonathan Ben-tzur, Moritz Hardt, Benjamin Recht, and Ameet Talwalkar. <em>A System for Massively Parallel Hyperparameter Tuning</em>. In Proceedings of Machine Learning and Systems, pages 230-246, 2020.</li>
+              <li id="ref-8">Peter Hedman, Julien Philip, True Price, Jan-Michael Frahm, George Drettakis, and Gabriel Brostow. <em>Deep Blending for Free-Viewpoint Image-Based Rendering</em>. In SIGGRAPH Asia 2018 Technical Papers, page 257, 2018.</li>
+              <li id="ref-9">Lu Ling, Yichen Sheng, Zhi Tu, Wentian Zhao, Cheng Xin, Kun Wan, Lantao Yu, Qianyu Guo, Zixun Yu, Yawen Lu, et al. <em>DL3DV-10K: A Large-Scale Scene Dataset for Deep Learning-Based 3D Vision</em>. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 22160-22169, 2024.</li>
+              <li id="ref-10">Jonathan T. Barron, Ben Mildenhall, Dor Verbin, Pratul P. Srinivasan, and Peter Hedman. <em>Mip-NeRF 360: Unbounded Anti-Aliased Neural Radiance Fields</em>. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 5470-5479, 2022.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container is-max-desktop content has-text-centered">
+        <p>
+          Website layout follows the open-source
+          <a href="https://github.com/oppo-us-research/SpacetimeGaussians-website">SpacetimeGaussians project page</a>.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
