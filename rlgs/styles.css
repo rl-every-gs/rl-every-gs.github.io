@@ -168,6 +168,12 @@ a {
   margin-top: 25px;
 }
 
+.code-release {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
 .button {
   display: inline-flex;
   gap: 7px;
